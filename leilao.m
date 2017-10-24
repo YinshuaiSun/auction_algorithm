@@ -10,29 +10,28 @@ Algorítmo de leilão
 % alocacao_objeto -> vetor de alocacao pessoas<-objetos
 
 % Entrada: matriz beneficio -> a (todos os valores positivos)
-%          qtd_pessoas -> numero de linhas de a
-%          qnt_objetos -> numero de colunas de a
+%          
+% qtd_pessoas -> numero de linhas de a
+% qnt_objetos -> numero de colunas de a
 
 % Se o objetivo é encontrar o mínimo, a matriz a deve ser multiplicada por
 % -1, e o valor total tambem deve ser multiplicado por -1
 
-function leilao(qtd_pessoas, qtd_obj, a)
+function leilao(a)
     e = 0.1;
-    preco_obj = zeros(1, qtd_obj); % [0 0 0]
+    [qtd_pessoas, qtd_obj] = size(a);
     total = 0;
     if(qtd_pessoas ~= qtd_obj)
-        conserta_a(qtd_pessoas, qtd_obj, a);
+        a = conserta_a(qtd_pessoas, qtd_obj, a);
     end
+    [linhas colunas] = size(a);
     %No inicio, nenhuma pessoa é alocada para nenhum objeto
-    alocacao_pessoa = zeros(1, qtd_pessoas);
-
+    alocacao_pessoa = zeros(1, linhas);
+    preco_obj = zeros(1, colunas); 
     %Enquanto existirem pessoas ou objetos nao alocados
     cont = 1;
     while (find(~alocacao_pessoa))
-        
-        fprintf('Iteracao: %d \n' ,cont);
-        cont = cont+1;
-        for i=1:qtd_pessoas
+        for i=1:linhas
             %b -> coluna com os valores de i para cada obj
             b = a(i,:)-preco_obj;
             [maior,j] = max(b);
@@ -52,14 +51,14 @@ function leilao(qtd_pessoas, qtd_obj, a)
             alocacao_pessoa(1,k) = 0; 
             %aloca o objeto j para pessoa i
             alocacao_pessoa(1,i) = j;   
-
-            alocacao_pessoa
         end
     end
     fprintf('Alocação Final: \n');
     for i=1:qtd_pessoas
-        total = total + a(i, alocacao_pessoa(i));
-        fprintf('(%d, %d)\n',i, alocacao_pessoa(i));
+        if alocacao_pessoa(i) <= qtd_obj
+            total = total + a(i, alocacao_pessoa(i));
+            fprintf('(%d, %d)\n',i, alocacao_pessoa(i));
+        end
     end
     fprintf('Benefício total: %d\n',total);
 end
@@ -68,15 +67,15 @@ function a = conserta_a(qtd_pessoas, qtd_obj, a)
     if(qtd_pessoas > qtd_obj)
         b = zeros(qtd_pessoas, qtd_pessoas);
         for i=1:qtd_obj
-            b(:,i) = a(:,i)+1;
+            b(:,i) = a(:,i);
         end       
-        b(:,qtd_obj) = 1;
     else
         b = zeros(qtd_obj, qtd_obj);
         for i=1:qtd_pessoas
-            b(i,:) = a(i,:)+1;
+            b(i,:) = a(i,:);
         end
-        b(qtd_pessoas,:) = 1;
+        b = transpose(b);
     end
     a = b;
 end
+    
